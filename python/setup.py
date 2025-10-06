@@ -7,15 +7,18 @@ import os
 import subprocess as sbp
 import os.path as osp
 
+os.environ.setdefault("CC",  "/opt/homebrew/bin/gcc-11")
+os.environ.setdefault("CXX", "/opt/homebrew/bin/g++-11")
+
 # Recover the gcc compiler
 GCCPATH_STRING = sbp.Popen(
-    ['gcc', '-print-libgcc-file-name'],
+    ['gcc-11', '-print-libgcc-file-name'],
     stdout=sbp.PIPE).communicate()[0]
 GCCPATH = osp.normpath(osp.dirname(GCCPATH_STRING)).decode()
 
 liblist = ["class"]
 MVEC_STRING = sbp.Popen(
-    ['gcc', '-lmvec'],
+    ['gcc-11', '-lmvec'],
     stderr=sbp.PIPE).communicate()[1]
 if b"mvec" not in MVEC_STRING:
     liblist += ["mvec","m"]

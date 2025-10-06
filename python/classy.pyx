@@ -1602,6 +1602,12 @@ cdef class Class:
     def Omega_Lambda(self):
         return self.ba.Omega0_lambda
 
+    def Omega_scf(self):
+        return self.ba.Omega0_scf
+
+    def V0_scf(self):
+        return self.ba.V0_scf
+
     def Omega_g(self):
         return self.ba.Omega0_g
 
@@ -2719,6 +2725,10 @@ cdef class Class:
                 value = self.ba.Omega0_lambda
             elif name == 'Omega0_fld':
                 value = self.ba.Omega0_fld
+            elif name == 'Omega0_scf':
+                value = self.ba.Omega0_scf
+            elif name == 'V0_scf':
+                value = self.ba.V0_scf
             elif name == 'age':
                 value = self.ba.age
             elif name == 'conformal_age':

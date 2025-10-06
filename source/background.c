@@ -404,6 +404,9 @@ int background_functions(
      p_prime = a_prime_over_a * dp_dloga = a_prime_over_a * Sum [ (w_prime/a_prime_over_a -3(1+w)w)rho].
      Note: The scalar field contribution must be added in the end, as an exception!*/
   double dp_dloga;
+  /* ET: added scale which is shooted for sampling purposes and rho_cdm for ds_scf */
+  double V0_scf=0.;
+  double rho_cdm;
 
   /** - initialize local variables */
   rho_tot = 0.;
@@ -440,6 +443,7 @@ int background_functions(
     rho_tot += pvecback[pba->index_bg_rho_cdm];
     p_tot += 0.;
     rho_m += pvecback[pba->index_bg_rho_cdm];
+    rho_cdm = pvecback[pba->index_bg_rho_cdm];
   }
 
   /* idm */
@@ -478,6 +482,16 @@ int background_functions(
     pvecback[pba->index_bg_V_scf] = V_scf(pba,phi); //V_scf(pba,phi); //write here potential as function of phi
     pvecback[pba->index_bg_dV_scf] = dV_scf(pba,phi); // dV_scf(pba,phi); //potential' as function of phi
     pvecback[pba->index_bg_ddV_scf] = ddV_scf(pba,phi); // ddV_scf(pba,phi); //potential'' as function of phi
+    /* ET: Add here definition of entropy functions */
+    pvecback[pba->index_bg_f_scf] = f_scf(pba,phi); //f_scf(pba,phi); //write here algebraic as function of phi
+    pvecback[pba->index_bg_df_scf] = df_scf(pba,phi); //df_scf(pba,phi); //write here algebraic as function of phi
+    pvecback[pba->index_bg_ddf_scf] = ddf_scf(pba,phi); //ddf_scf(pba,phi); //write here algebraic as function of phi
+    pvecback[pba->index_bg_h_scf] = h_scf(pba,phi); //h_scf(pba,phi); //write here derivative as function of phi
+    pvecback[pba->index_bg_As_scf] = As_scf(pba); //As_scf(pba); //write here scale in delta_s
+    pvecback[pba->index_bg_ns_scf] = ns_scf(pba); //ns_scf(pba); //write here power of k in delta_s 
+    pvecback[pba->index_bg_kp_scf] = kp_scf(pba); //kp_scf(pba); //write here pivot scale of k in delta_s 
+    pvecback[pba->index_bg_kc_scf] = kc_scf(pba); //kc_scf(pba); //write here cut-off scale in delta_s 
+    pvecback[pba->index_bg_pc_scf] = pc_scf(pba); //pc_scf(pba,phi); //write here suppression power of k in delta_s 
     pvecback[pba->index_bg_rho_scf] = (phi_prime*phi_prime/(2*a*a) + V_scf(pba,phi))/3.; // energy of the scalar field. The field units are set automatically by setting the initial conditions
     pvecback[pba->index_bg_p_scf] =(phi_prime*phi_prime/(2*a*a) - V_scf(pba,phi))/3.; // pressure of the scalar field
     rho_tot += pvecback[pba->index_bg_rho_scf];
@@ -1069,6 +1083,16 @@ int background_indices(
   class_define_index(pba->index_bg_V_scf,pba->has_scf,index_bg,1);
   class_define_index(pba->index_bg_dV_scf,pba->has_scf,index_bg,1);
   class_define_index(pba->index_bg_ddV_scf,pba->has_scf,index_bg,1);
+  /* ET: Add definition of entropy functions */
+  class_define_index(pba->index_bg_f_scf,pba->has_scf,index_bg,1);
+  class_define_index(pba->index_bg_df_scf,pba->has_scf,index_bg,1);
+  class_define_index(pba->index_bg_ddf_scf,pba->has_scf,index_bg,1);
+  class_define_index(pba->index_bg_h_scf,pba->has_scf,index_bg,1);
+  class_define_index(pba->index_bg_As_scf,pba->has_scf,index_bg,1);
+  class_define_index(pba->index_bg_ns_scf,pba->has_scf,index_bg,1);
+  class_define_index(pba->index_bg_kp_scf,pba->has_scf,index_bg,1);
+  class_define_index(pba->index_bg_kc_scf,pba->has_scf,index_bg,1);
+  class_define_index(pba->index_bg_pc_scf,pba->has_scf,index_bg,1);
   class_define_index(pba->index_bg_rho_scf,pba->has_scf,index_bg,1);
   class_define_index(pba->index_bg_p_scf,pba->has_scf,index_bg,1);
   class_define_index(pba->index_bg_p_prime_scf,pba->has_scf,index_bg,1);
@@ -2073,6 +2097,8 @@ int background_solve(
       printf("     -> Omega_ini_dcdm/Omega_b = %f\n",pba->Omega_ini_dcdm/pba->Omega0_b);
     }
     if (pba->has_scf == _TRUE_) {
+      /* ET: Change here depending on form of potential*/
+      pba->V0_scf = pba->background_table[pba->index_bg_V_scf]/((1.44983e-7)*exp(-pba->scf_parameters[0]*pba->background_table[pba->index_bg_phi_scf]));
       printf("    Scalar field details:\n");
       printf("     -> Omega_scf = %g, wished %g\n",
              pba->background_table[(pba->bt_size-1)*pba->bg_size+pba->index_bg_rho_scf]/pba->background_table[(pba->bt_size-1)*pba->bg_size+pba->index_bg_rho_crit], pba->Omega0_scf);
@@ -2086,6 +2112,8 @@ int background_solve(
         printf("%.3f, ",pba->scf_parameters[index_scf]);
       }
       printf("%.3f]\n",pba->scf_parameters[pba->scf_parameters_size-1]);
+      /* ET: Print value of V0 to check */
+      printf("     -> V0_scf = %f\n",pba->V0_scf);
     }
   }
 
@@ -2281,11 +2309,12 @@ int background_initial_conditions(
     else {
       printf("Not using attractor initial conditions\n");
       /** - --> If no attractor initial conditions are assigned, gets the provided ones. */
+      /* ET: Correct repeated phi to phi_prime*/
       pvecback_integration[pba->index_bi_phi_scf] = pba->phi_ini_scf;
       pvecback_integration[pba->index_bi_phi_prime_scf] = pba->phi_prime_ini_scf;
     }
     class_test(!isfinite(pvecback_integration[pba->index_bi_phi_scf]) ||
-               !isfinite(pvecback_integration[pba->index_bi_phi_scf]),
+               !isfinite(pvecback_integration[pba->index_bi_phi_prime_scf]),
                pba->error_message,
                "initial phi = %e phi_prime = %e -> check initial conditions",
                pvecback_integration[pba->index_bi_phi_scf],
@@ -2466,6 +2495,16 @@ int background_output_titles(
   class_store_columntitle(titles,"V_scf",pba->has_scf);
   class_store_columntitle(titles,"V'_scf",pba->has_scf);
   class_store_columntitle(titles,"V''_scf",pba->has_scf);
+  /* ET: Add definition of entropy functions */
+  class_store_columntitle(titles,"f_scf",pba->has_scf);
+  class_store_columntitle(titles,"f'_scf",pba->has_scf);
+  class_store_columntitle(titles,"f''_scf",pba->has_scf);
+  class_store_columntitle(titles,"h_scf",pba->has_scf);
+  class_store_columntitle(titles,"As_scf",pba->has_scf);
+  class_store_columntitle(titles,"ns_scf",pba->has_scf);
+  class_store_columntitle(titles,"kp_scf",pba->has_scf);
+  class_store_columntitle(titles,"kc_scf",pba->has_scf);
+  class_store_columntitle(titles,"pc_scf",pba->has_scf);
 
   class_store_columntitle(titles,"(.)rho_tot",_TRUE_);
   class_store_columntitle(titles,"(.)p_tot",_TRUE_);
@@ -2539,6 +2578,16 @@ int background_output_data(
     class_store_double(dataptr,pvecback[pba->index_bg_V_scf],pba->has_scf,storeidx);
     class_store_double(dataptr,pvecback[pba->index_bg_dV_scf],pba->has_scf,storeidx);
     class_store_double(dataptr,pvecback[pba->index_bg_ddV_scf],pba->has_scf,storeidx);
+    /* ET: Add definition of entropy functions */
+    class_store_double(dataptr,pvecback[pba->index_bg_f_scf],pba->has_scf,storeidx);
+    class_store_double(dataptr,pvecback[pba->index_bg_df_scf],pba->has_scf,storeidx);
+    class_store_double(dataptr,pvecback[pba->index_bg_ddf_scf],pba->has_scf,storeidx);
+    class_store_double(dataptr,pvecback[pba->index_bg_h_scf],pba->has_scf,storeidx);
+    class_store_double(dataptr,pvecback[pba->index_bg_As_scf],pba->has_scf,storeidx);
+    class_store_double(dataptr,pvecback[pba->index_bg_ns_scf],pba->has_scf,storeidx);
+    class_store_double(dataptr,pvecback[pba->index_bg_kp_scf],pba->has_scf,storeidx);
+    class_store_double(dataptr,pvecback[pba->index_bg_kc_scf],pba->has_scf,storeidx);
+    class_store_double(dataptr,pvecback[pba->index_bg_pc_scf],pba->has_scf,storeidx);
 
     class_store_double(dataptr,pvecback[pba->index_bg_rho_tot],_TRUE_,storeidx);
     class_store_double(dataptr,pvecback[pba->index_bg_p_tot],_TRUE_,storeidx);
@@ -2657,6 +2706,7 @@ int background_derivs(
   if (pba->has_scf == _TRUE_) {
     /** - Scalar field equation: \f$ \phi'' + 2 a H \phi' + a^2 dV = 0 \f$  (note H is wrt cosmological time)
         written as \f$ d\phi/dlna = phi' / (aH) \f$ and \f$ d\phi'/dlna = -2*phi' - (a/H) dV \f$ */
+     /* ET: Since we only added the potential and the entropy coupling does not contribute at the background nothing changes here as long as everything is well-defined*/
     dy[pba->index_bi_phi_scf] = y[pba->index_bi_phi_prime_scf]/a/H;
     dy[pba->index_bi_phi_prime_scf] = - 2*y[pba->index_bi_phi_prime_scf] - a*dV_scf(pba,y[pba->index_bi_phi_scf])/H ;
   }
@@ -2901,38 +2951,148 @@ int background_output_budget(
  and \f$ \rho^{class} \f$ has the proper dimension \f$ Mpc^-2 \f$.
 */
 
-double V_e_scf(struct background *pba,
+/* ET: In principle could optimise this to include all the potentials we want to consider */
+
+double V_scf(struct background *pba,
                double phi
                ) {
   double scf_lambda = pba->scf_parameters[0];
-  //  double scf_alpha  = pba->scf_parameters[1];
-  //  double scf_A      = pba->scf_parameters[2];
-  //  double scf_B      = pba->scf_parameters[3];
+  double scf_V0  = pba->scf_parameters[1];
 
-  return  exp(-scf_lambda*phi);
+  return  scf_V0*(1.e-120)*(1.44983e113)*exp(-scf_lambda*phi);
+  //return scf_V0*(1.e-120)*(1.44983e113);
 }
 
-double dV_e_scf(struct background *pba,
+double dV_scf(struct background *pba,
                 double phi
                 ) {
   double scf_lambda = pba->scf_parameters[0];
-  //  double scf_alpha  = pba->scf_parameters[1];
-  //  double scf_A      = pba->scf_parameters[2];
-  //  double scf_B      = pba->scf_parameters[3];
 
-  return -scf_lambda*V_e_scf(pba,phi);
+  return -scf_lambda*V_scf(pba,phi);
+  //return 0;
 }
 
-double ddV_e_scf(struct background *pba,
+double ddV_scf(struct background *pba,
                  double phi
                  ) {
   double scf_lambda = pba->scf_parameters[0];
-  //  double scf_alpha  = pba->scf_parameters[1];
-  //  double scf_A      = pba->scf_parameters[2];
-  //  double scf_B      = pba->scf_parameters[3];
 
-  return pow(-scf_lambda,2)*V_e_scf(pba,phi);
+  return pow(-scf_lambda,2)*V_scf(pba,phi);
+  //return 0;
 }
+
+double f_scf(struct background *pba,
+               double phi
+               ) {
+  double scf_f0  = pba->scf_parameters[2];
+
+  //return  scf_f0*phi;
+  return  scf_f0*(1.e-120)*(1.44983e113)*phi;
+  //return scf_V0*(1.e-120)*(1.44983e113);
+}
+
+double df_scf(struct background *pba,
+               double phi
+               ) {
+  double scf_f0  = pba->scf_parameters[2];
+
+  //return  scf_f0;
+  return  scf_f0*(1.e-120)*(1.44983e113);
+  //return scf_V0*(1.e-120)*(1.44983e113);
+}
+
+double ddf_scf(struct background *pba,
+                 double phi
+                 ) {
+  double scf_f0  = pba->scf_parameters[2];
+
+  //return pow(-scf_lambda,2)*V_scf(pba,phi);
+  return 0;
+}
+
+double h_scf(struct background *pba,
+               double phi
+               ) {
+  double scf_h0  = pba->scf_parameters[3];
+
+  return  scf_h0;
+  //return scf_V0*(1.e-120)*(1.44983e113);
+}
+
+/* ET: Add function for input entropy perturbation */
+
+double As_scf(struct background *pba
+                 ) {
+  double As  = pba->scf_parameters[4];
+
+  return As;
+  //return 0;
+}
+
+double ns_scf(struct background *pba
+                 ) {
+  double ns = pba->scf_parameters[5];
+
+  return ns;
+  //return 0;
+}
+
+double kp_scf(struct background *pba
+                 ) {
+  double kp = pba->scf_parameters[6];
+
+  return kp;
+  //return 0;
+}
+
+double kc_scf(struct background *pba
+                 ) {
+  double kc = pba->scf_parameters[7];
+
+  return kc;
+  //return 0;
+}
+
+double pc_scf(struct background *pba
+                 ) {
+  double pc = pba->scf_parameters[8];
+
+  return pc;
+  //return 0;
+}
+
+// double V_e_scf(struct background *pba,
+//                double phi
+//                ) {
+//   double scf_lambda = pba->scf_parameters[0];
+//   //  double scf_alpha  = pba->scf_parameters[1];
+//   //  double scf_A      = pba->scf_parameters[2];
+//   //  double scf_B      = pba->scf_parameters[3];
+
+//   return  exp(-scf_lambda*phi);
+// }
+
+// double dV_e_scf(struct background *pba,
+//                 double phi
+//                 ) {
+//   double scf_lambda = pba->scf_parameters[0];
+//   //  double scf_alpha  = pba->scf_parameters[1];
+//   //  double scf_A      = pba->scf_parameters[2];
+//   //  double scf_B      = pba->scf_parameters[3];
+
+//   return -scf_lambda*V_e_scf(pba,phi);
+// }
+
+// double ddV_e_scf(struct background *pba,
+//                  double phi
+//                  ) {
+//   double scf_lambda = pba->scf_parameters[0];
+//   //  double scf_alpha  = pba->scf_parameters[1];
+//   //  double scf_A      = pba->scf_parameters[2];
+//   //  double scf_B      = pba->scf_parameters[3];
+
+//   return pow(-scf_lambda,2)*V_e_scf(pba,phi);
+// }
 
 
 /** parameters and functions for the polynomial coefficient
@@ -2945,57 +3105,57 @@ double ddV_e_scf(struct background *pba,
  * double scf_A = 0.01; (values for their Figure 2)
  */
 
-double V_p_scf(
-               struct background *pba,
-               double phi) {
-  //  double scf_lambda = pba->scf_parameters[0];
-  double scf_alpha  = pba->scf_parameters[1];
-  double scf_A      = pba->scf_parameters[2];
-  double scf_B      = pba->scf_parameters[3];
+// double V_p_scf(
+//                struct background *pba,
+//                double phi) {
+//   //  double scf_lambda = pba->scf_parameters[0];
+//   double scf_alpha  = pba->scf_parameters[1];
+//   double scf_A      = pba->scf_parameters[2];
+//   double scf_B      = pba->scf_parameters[3];
 
-  return  pow(phi - scf_B,  scf_alpha) +  scf_A;
-}
+//   return  pow(phi - scf_B,  scf_alpha) +  scf_A;
+// }
 
-double dV_p_scf(
-                struct background *pba,
-                double phi) {
+// double dV_p_scf(
+//                 struct background *pba,
+//                 double phi) {
 
-  //  double scf_lambda = pba->scf_parameters[0];
-  double scf_alpha  = pba->scf_parameters[1];
-  //  double scf_A      = pba->scf_parameters[2];
-  double scf_B      = pba->scf_parameters[3];
+//   //  double scf_lambda = pba->scf_parameters[0];
+//   double scf_alpha  = pba->scf_parameters[1];
+//   //  double scf_A      = pba->scf_parameters[2];
+//   double scf_B      = pba->scf_parameters[3];
 
-  return   scf_alpha*pow(phi -  scf_B,  scf_alpha - 1);
-}
+//   return   scf_alpha*pow(phi -  scf_B,  scf_alpha - 1);
+// }
 
-double ddV_p_scf(
-                 struct background *pba,
-                 double phi) {
-  //  double scf_lambda = pba->scf_parameters[0];
-  double scf_alpha  = pba->scf_parameters[1];
-  //  double scf_A      = pba->scf_parameters[2];
-  double scf_B      = pba->scf_parameters[3];
+// double ddV_p_scf(
+//                  struct background *pba,
+//                  double phi) {
+//   //  double scf_lambda = pba->scf_parameters[0];
+//   double scf_alpha  = pba->scf_parameters[1];
+//   //  double scf_A      = pba->scf_parameters[2];
+//   double scf_B      = pba->scf_parameters[3];
 
-  return  scf_alpha*(scf_alpha - 1.)*pow(phi -  scf_B,  scf_alpha - 2);
-}
+//   return  scf_alpha*(scf_alpha - 1.)*pow(phi -  scf_B,  scf_alpha - 2);
+// }
 
-/** Fianlly we can obtain the overall potential \f$ V = V_p*V_e \f$
- */
+// /** Fianlly we can obtain the overall potential \f$ V = V_p*V_e \f$
+//  */
 
-double V_scf(
-             struct background *pba,
-             double phi) {
-  return  V_e_scf(pba,phi)*V_p_scf(pba,phi);
-}
+// double V_scf(
+//              struct background *pba,
+//              double phi) {
+//   return  V_e_scf(pba,phi)*V_p_scf(pba,phi);
+// }
 
-double dV_scf(
-              struct background *pba,
-              double phi) {
-  return dV_e_scf(pba,phi)*V_p_scf(pba,phi) + V_e_scf(pba,phi)*dV_p_scf(pba,phi);
-}
+// double dV_scf(
+//               struct background *pba,
+//               double phi) {
+//   return dV_e_scf(pba,phi)*V_p_scf(pba,phi) + V_e_scf(pba,phi)*dV_p_scf(pba,phi);
+// }
 
-double ddV_scf(
-               struct background *pba,
-               double phi) {
-  return ddV_e_scf(pba,phi)*V_p_scf(pba,phi) + 2*dV_e_scf(pba,phi)*dV_p_scf(pba,phi) + V_e_scf(pba,phi)*ddV_p_scf(pba,phi);
-}
+// double ddV_scf(
+//                struct background *pba,
+//                double phi) {
+//   return ddV_e_scf(pba,phi)*V_p_scf(pba,phi) + 2*dV_e_scf(pba,phi)*dV_p_scf(pba,phi) + V_e_scf(pba,phi)*ddV_p_scf(pba,phi);
+// }

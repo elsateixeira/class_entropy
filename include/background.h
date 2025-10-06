@@ -103,6 +103,7 @@ struct background
   double Omega0_lambda;    /**< \f$ \Omega_{0_\Lambda} \f$: cosmological constant */
   double Omega0_fld;       /**< \f$ \Omega_{0 de} \f$: fluid */
   double Omega0_scf;       /**< \f$ \Omega_{0 scf} \f$: scalar field */
+  double V0_scf;        /**< ET: \f$ \V0_{scf} \f$: shooting parameter scalar field */
   short use_ppf; /**< flag switching on PPF perturbation equations instead of true fluid equations for perturbations. It could have been defined inside
                     perturbation structure, but we leave it here in such way to have all fld parameters grouped. */
   double c_gamma_over_c_fld; /**< ppf parameter defined in eq. (16) of 0808.3125 [astro-ph] */
@@ -178,6 +179,16 @@ struct background
   int index_bg_V_scf;         /**< scalar field potential V */
   int index_bg_dV_scf;        /**< scalar field potential derivative V' */
   int index_bg_ddV_scf;       /**< scalar field potential second derivative V'' */
+  /* ET: Add definition of entropy functions */
+  int index_bg_f_scf;       /**< dark matter entropy perturbation */
+  int index_bg_df_scf;       /**< dark matter entropy perturbation */
+  int index_bg_ddf_scf;       /**< dark matter entropy perturbation */
+  int index_bg_h_scf;       /**< dark matter entropy perturbation */
+  int index_bg_As_scf;       /**< dark matter entropy perturbation */
+  int index_bg_ns_scf;       /**< dark matter entropy perturbation */
+  int index_bg_kp_scf;       /**< dark matter entropy perturbation */
+  int index_bg_kc_scf;       /**< dark matter entropy perturbation */
+  int index_bg_pc_scf;       /**< dark matter entropy perturbation */
   int index_bg_rho_scf;       /**< scalar field energy density */
   int index_bg_p_scf;         /**< scalar field pressure */
   int index_bg_p_prime_scf;         /**< scalar field pressure */
@@ -561,6 +572,49 @@ extern "C" {
                  struct background *pba,
                  double phi
                  );
+
+  /* ET: Add here definition of entropy functions */
+
+  double f_scf(
+                 struct background *pba,
+                 double phi
+                 );
+
+  double df_scf(
+                 struct background *pba,
+                 double phi
+                 );
+
+  double ddf_scf(
+                 struct background *pba,
+                 double phi
+                 );
+
+  double h_scf(
+                 struct background *pba,
+                 double phi
+                 );
+
+  double As_scf(
+                 struct background *pba
+                 );
+
+  double ns_scf(
+                 struct background *pba
+                 );
+
+  double kp_scf(
+                 struct background *pba
+                 );
+
+  double kc_scf(
+                 struct background *pba
+                 );
+
+  double pc_scf(
+                 struct background *pba
+                 );
+  
 
   /** Coupling between scalar field and matter **/
   double Q_scf(
