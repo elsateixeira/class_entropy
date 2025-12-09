@@ -67,6 +67,8 @@ struct background
 
   double Omega0_cdm;      /**< \f$ \Omega_{0 cdm} \f$: cold dark matter */
 
+  double Omega0_edm;      /**< ET: \f$ \Omega_{0 edm} \f$: entropic dark matter */
+
   double Omega0_idm; /**< \f$ \Omega_{0 idm} \f$: interacting dark matter with photons, baryons, and idr */
 
 
@@ -165,6 +167,7 @@ struct background
   int index_bg_rho_g;         /**< photon density */
   int index_bg_rho_b;         /**< baryon density */
   int index_bg_rho_cdm;       /**< cdm density */
+  int index_bg_rho_edm;       /**< ET: edm density */
   int index_bg_rho_idm;       /**< idm density */
   int index_bg_rho_lambda;    /**< cosmological constant density */
   int index_bg_rho_fld;       /**< fluid density */
@@ -206,7 +209,7 @@ struct background
   /* end of vector in normal format, now quantities in long format */
 
   int index_bg_rho_crit;      /**< critical density */
-  int index_bg_Omega_m;       /**< non-relativistic density fraction (\f$ \Omega_b + \Omega_cdm + \Omega_{\nu nr} \f$) */
+  int index_bg_Omega_m;       /**< ET: non-relativistic density fraction (\f$ \Omega_b + \Omega_cdm + \Omega_edm + \Omega_{\nu nr} \f$) */
   int index_bg_conf_distance; /**< conformal distance (from us) in Mpc */
   int index_bg_ang_distance;  /**< angular diameter distance in Mpc */
   int index_bg_lum_distance;  /**< luminosity distance in Mpc */
@@ -291,6 +294,7 @@ struct background
   //@{
 
   short has_cdm;       /**< presence of cold dark matter? */
+  short has_edm;       /**< ET: presence of entropic dark matter? */
   short has_idm;       /**< presence of interacting dark matter with photons, baryons, and idr */
   short has_dcdm;      /**< presence of decaying cold dark matter? */
   short has_dr;        /**< presence of relativistic decay radiation? */

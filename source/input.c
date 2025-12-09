@@ -1195,8 +1195,9 @@ int input_get_guess(double *xguess,
       xguess[index_guess] = pfzw->target_value[index_guess] - N_nonur_guess;
       dxdy[index_guess] = 1.;
       break;
+      /* ET: Add edm*/
     case Omega_dcdmdr:
-      Omega_M = ba.Omega0_cdm+ba.Omega0_idm+ba.Omega0_dcdmdr+ba.Omega0_b;
+      Omega_M = ba.Omega0_cdm+ba.Omega0_edm+ba.Omega0_idm+ba.Omega0_dcdmdr+ba.Omega0_b;
       /* *
        * This formula is exact in a Matter + Lambda Universe, but only for Omega_dcdm,
        * not the combined.
@@ -1214,8 +1215,9 @@ int input_get_guess(double *xguess,
       xguess[index_guess] = pfzw->target_value[index_guess]/a_decay;
       dxdy[index_guess] = 1./a_decay;
       break;
+      /* ET: Add edm*/
     case omega_dcdmdr:
-      Omega_M = ba.Omega0_cdm+ba.Omega0_idm+ba.Omega0_dcdmdr+ba.Omega0_b;
+      Omega_M = ba.Omega0_cdm+ba.Omega0_edm+ba.Omega0_idm+ba.Omega0_dcdmdr+ba.Omega0_b;
       gamma = ba.Gamma_dcdm/ba.H0;
       if (gamma < 1)
         a_decay = 1.0;
@@ -1248,7 +1250,8 @@ int input_get_guess(double *xguess,
       /* This works since correspondence is Omega_ini_dcdm -> Omega_dcdmdr and
          omega_ini_dcdm -> omega_dcdmdr */
       Omega0_dcdmdr *=pfzw->target_value[index_guess];
-      Omega_M = ba.Omega0_cdm+ba.Omega0_idm+Omega0_dcdmdr+ba.Omega0_b;
+      /* ET: Add edm*/
+      Omega_M = ba.Omega0_cdm+ba.Omega0_edm+ba.Omega0_idm+Omega0_dcdmdr+ba.Omega0_b;
       gamma = ba.Gamma_dcdm/ba.H0;
       if (gamma < 1)
         a_decay = 1.0;
@@ -2353,7 +2356,8 @@ int input_read_parameters_species(struct file_content * pfc,
   double sigma_B; // Stefan-Boltzmann constant
   double stat_f_idr = 7./8.;
   double f_cdm=1., f_idm=0.;
-  short has_m_budget = _FALSE_, has_cdm_userdefined = _FALSE_;
+  /* ET: Add edm*/
+  short has_m_budget = _FALSE_, has_cdm_userdefined = _FALSE_, has_edm_userdefined = _FALSE_;
   double Omega_m_remaining = 0.;
 
 
@@ -2494,6 +2498,29 @@ int input_read_parameters_species(struct file_content * pfc,
   }
   class_test(pba->Omega0_cdm<0,errmsg, "You cannot set the cold dark matter density to negative values.");
 
+  /** ET: 4) Omega_0_edm (EDM) */
+  /* Read */
+  class_call(parser_read_double(pfc,"Omega_edm",&param1,&flag1,errmsg),
+             errmsg,
+             errmsg);
+  class_call(parser_read_double(pfc,"omega_edm",&param2,&flag2,errmsg),
+             errmsg,
+             errmsg);
+  /* Test */
+  class_test(((flag1 == _TRUE_) && (flag2 == _TRUE_)),
+             errmsg,
+             "You can only enter one of 'Omega_edm' or 'omega_edm'.");
+  /* Complete set of parameters */
+  if (flag1 == _TRUE_){
+    pba->Omega0_edm = param1;
+    has_edm_userdefined = _TRUE_;
+  }
+  if (flag2 == _TRUE_){
+    pba->Omega0_edm = param2/pba->h/pba->h;
+    has_edm_userdefined = _TRUE_;
+  }
+  class_test(pba->Omega0_edm<0,errmsg, "You cannot set the entropic dark matter density to negative values.");
+
   /** 4) (Second part) Omega_0_m (total non-relativistic) */
   class_call(parser_read_double(pfc,"Omega_m",&param1,&flag1,errmsg),
              errmsg,
@@ -2516,6 +2543,8 @@ int input_read_parameters_species(struct file_content * pfc,
   }
   class_test(Omega_m_remaining<0,errmsg, "You cannot set the total matter density to negative values.");
   class_test(has_cdm_userdefined == _TRUE_ && has_m_budget == _TRUE_, errmsg, "If you want to use 'Omega_m' you cannot fix 'Omega_cdm' simultaneously. Please remove either 'Omega_cdm' or 'Omega_m' from the input file.");
+  /* ET: Add edm*/
+  class_test(has_edm_userdefined == _TRUE_ && has_m_budget == _TRUE_, errmsg, "If you want to use 'Omega_m' you cannot fix 'Omega_edm' simultaneously. Please remove either 'Omega_edm' or 'Omega_m' from the input file.");
   if (has_m_budget == _TRUE_) {
     class_test(Omega_m_remaining < pba->Omega0_b, errmsg, "Too much energy density from matter species. At this point only %e is left for Omega_m, but requested 'Omega_b = %e'",Omega_m_remaining, pba->Omega0_b);
     Omega_m_remaining-= pba->Omega0_b;
@@ -3207,6 +3236,8 @@ int input_read_parameters_species(struct file_content * pfc,
   Omega_tot += pba->Omega0_b;
   Omega_tot += pba->Omega0_ur;
   Omega_tot += pba->Omega0_cdm;
+  /* ET: Add edm*/
+  Omega_tot += pba->Omega0_edm;
   Omega_tot += pba->Omega0_idm;
   Omega_tot += pba->Omega0_dcdmdr;
   Omega_tot += pba->Omega0_idr;
@@ -5817,6 +5848,9 @@ int input_default_params(struct background *pba,
   /** 4) CDM density */
   pba->Omega0_cdm = 0.1201075/pow(pba->h,2);
 
+  /** 4) ET: Deadult EDM density */
+  pba->Omega0_edm = 0.1201075/pow(pba->h,2);
+
   /** 5) ncdm sector */
   /** 5.a) Number of distinct species */
   pba->N_ncdm = 0;
@@ -5890,7 +5924,8 @@ int input_default_params(struct background *pba,
   /** 9) Dark energy contributions */
   pba->Omega0_fld = 0.;
   pba->Omega0_scf = 0.;
-  pba->Omega0_lambda = 1.-pba->Omega0_k-pba->Omega0_g-pba->Omega0_ur-pba->Omega0_b-pba->Omega0_cdm-pba->Omega0_ncdm_tot-pba->Omega0_dcdmdr - pba->Omega0_idr -pba->Omega0_idm;
+  /* ET: Add edm */
+  pba->Omega0_lambda = 1.-pba->Omega0_k-pba->Omega0_g-pba->Omega0_ur-pba->Omega0_b-pba->Omega0_cdm-pba->Omega0_edm-pba->Omega0_ncdm_tot-pba->Omega0_dcdmdr - pba->Omega0_idr -pba->Omega0_idm;
   /** 8.a) Omega fluid */
   /** 8.a.1) PPF approximation */
   pba->use_ppf = _TRUE_;
