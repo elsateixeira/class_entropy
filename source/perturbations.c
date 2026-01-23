@@ -5468,6 +5468,7 @@ int perturbations_initial_conditions(struct precision * ppr,
     /* (k tau)^2, (k tau)^3 */
     ktau_two=k*k*tau*tau;
     ktau_three=k*tau*ktau_two;
+    k2=k*k;
 
 
     /* curvature-dependent factors */
@@ -5515,8 +5516,11 @@ int perturbations_initial_conditions(struct precision * ppr,
 
       /* ET: entropic dark matter */
       if (pba->has_edm == _TRUE_) {
+        delta_s_scf = ppw->pvecback[pba->index_bg_As_scf] * pow(k,ppw->pvecback[pba->index_bg_ns_scf]);
+        
         ppw->pv->y[ppw->pv->index_pt_delta_edm] = 3./4.*ppw->pv->y[ppw->pv->index_pt_delta_g]; /* edm density */
-        ppw->pv->y[ppw->pv->index_pt_theta_edm] = ppw->pv->y[ppw->pv->index_pt_theta_g];
+        ppw->pv->y[ppw->pv->index_pt_theta_edm] = -(1./5.) * k2 * pow(tau,4) * (ppw->pvecback[pba->index_bg_f_scf]
+               - ppw->pvecback[pba->index_bg_h_scf]*ppw->pvecback[pba->index_bg_dV_scf])* delta_s_scf/ ppw->pvecback[pba->index_bg_rho_edm];
       }
       
       /* interacting dark matter */
@@ -5557,16 +5561,14 @@ int perturbations_initial_conditions(struct precision * ppr,
 
         // ET: Add my changes to initial conditions here
 
+        if (pba->has_edm == _FALSE_) {
+          delta_s_scf = 0.;  /* ET: you used this form in your sources */
+        }
 
-        delta_s_scf = ppw->pvecback[pba->index_bg_As_scf]*pow(k, ppw->pvecback[pba->index_bg_ns_scf]);  /* ET: you used this form in your sources */
-
-        //ppw->pv->y[ppw->pv->index_pt_phi_scf] = - (ppw->pvecback[pba->index_bg_h_scf]*delta_s_scf*(tau*tau))/6.0 - (a*a*(2.0*ppw->pvecback[pba->index_bg_dV_scf]*ppw->pv->y[ppw->pv->index_pt_phi] + ppw->pvecback[pba->index_bg_df_scf]*delta_s_scf)*(tau*tau) )/20.0;
-        //ppw->pv->y[ppw->pv->index_pt_phi_prime_scf] = - (ppw->pvecback[pba->index_bg_h_scf]*delta_s_scf*tau)/3.0 - (a*a*(2.0*ppw->pvecback[pba->index_bg_dV_scf]*ppw->pv->y[ppw->pv->index_pt_phi] + ppw->pvecback[pba->index_bg_df_scf]*delta_s_scf)*tau)/5.0;
-
-        ppw->pv->y[ppw->pv->index_pt_phi_scf] = 0.;
+        ppw->pv->y[ppw->pv->index_pt_phi_scf] = - (ppw->pvecback[pba->index_bg_h_scf] * delta_s_scf) * ktau_two / 6.0 - ((a/tau) * (a/tau) * ppw->pvecback[pba->index_bg_df_scf] * delta_s_scf) * pow(tau,4) / 20.0 ;
         /*  a*a/k/k/ppw->pvecback[pba->index_bg_phi_prime_scf]*k*ktau_three/4.*1./(4.-6.*(1./3.)+3.*1.) * (ppw->pvecback[pba->index_bg_rho_scf] + ppw->pvecback[pba->index_bg_p_scf])* ppr->curvature_ini * s2_squared; */
 
-        ppw->pv->y[ppw->pv->index_pt_phi_prime_scf] = 0.;
+        ppw->pv->y[ppw->pv->index_pt_phi_prime_scf] = - (ppw->pvecback[pba->index_bg_h_scf] * delta_s_scf) * (k*k*tau) / 3.0 - ((a/tau) * (a/tau)  * ppw->pvecback[pba->index_bg_df_scf] * delta_s_scf) * pow(tau,3) / 5.0;
         /* delta_fld expression * rho_scf with the w = 1/3, c_s = 1
            a*a/ppw->pvecback[pba->index_bg_phi_prime_scf]*( - ktau_two/4.*(1.+1./3.)*(4.-3.*1.)/(4.-6.*(1/3.)+3.*1.)*ppw->pvecback[pba->index_bg_rho_scf] - ppw->pvecback[pba->index_bg_dV_scf]*ppw->pv->y[ppw->pv->index_pt_phi_scf])* ppr->curvature_ini * s2_squared; */
       }
