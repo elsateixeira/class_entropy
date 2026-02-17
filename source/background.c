@@ -2993,27 +2993,33 @@ double V_scf(struct background *pba,
                ) {
   double scf_lambda = pba->scf_parameters[0];
   double scf_V0  = pba->scf_parameters[1];
+  double scf_f0  = pba->scf_parameters[2];
 
   return  scf_V0*(1.e-120)*(1.44983e113)*exp(-scf_lambda*phi);
-  //return scf_V0*(1.e-120)*(1.44983e113);
+  //return  scf_V0*(1.e-120)*(1.44983e113)*phi + scf_V0*(1.e-120)*(1.44983e113)*exp(-scf_lambda*phi);
+  //return scf_V0*(1.e-120)*(1.44983e113)*phi;
 }
 
 double dV_scf(struct background *pba,
                 double phi
                 ) {
   double scf_lambda = pba->scf_parameters[0];
+  double scf_V0  = pba->scf_parameters[1];
+  double scf_f0  = pba->scf_parameters[2];
 
   return -scf_lambda*V_scf(pba,phi);
-  //return 0;
+  //return  scf_V0*(1.e-120)*(1.44983e113) - scf_lambda*V_scf(pba,phi);
+  //return scf_V0*(1.e-120)*(1.44983e113);
 }
 
 double ddV_scf(struct background *pba,
                  double phi
                  ) {
   double scf_lambda = pba->scf_parameters[0];
+  double scf_V0  = pba->scf_parameters[1];
 
   return pow(-scf_lambda,2)*V_scf(pba,phi);
-  //return 0;
+  //return pow(-scf_lambda,2)*V_scf(pba,phi);
 }
 
 double f_scf(struct background *pba,
