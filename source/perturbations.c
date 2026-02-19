@@ -5517,7 +5517,8 @@ int perturbations_initial_conditions(struct precision * ppr,
       /* ET: entropic dark matter */
       if (pba->has_edm == _TRUE_) {
         //delta_s_scf = ppw->pvecback[pba->index_bg_As_scf] * pow(k,ppw->pvecback[pba->index_bg_ns_scf]);
-        delta_s_scf = ppw->pvecback[pba->index_bg_As_scf]*pow((k/ppw->pvecback[pba->index_bg_kp_scf]),ppw->pvecback[pba->index_bg_ns_scf]);
+        //delta_s_scf = ppw->pvecback[pba->index_bg_As_scf]*pow((k/ppw->pvecback[pba->index_bg_kp_scf]),ppw->pvecback[pba->index_bg_ns_scf]) * exp( - pow(k/(ppw->pvecback[pba->index_bg_kc_scf]), ppw->pvecback[pba->index_bg_pc_scf]) );
+        delta_s_scf = ppw->pvecback[pba->index_bg_As_scf]*pow((k/ppw->pvecback[pba->index_bg_kp_scf]),ppw->pvecback[pba->index_bg_ns_scf]) * exp( - pow(k/(ppw->pvecback[pba->index_bg_kc_scf]), ppw->pvecback[pba->index_bg_pc_scf]) );
         
         ppw->pv->y[ppw->pv->index_pt_delta_edm] = 3./4.*ppw->pv->y[ppw->pv->index_pt_delta_g]; /* edm density */
         ppw->pv->y[ppw->pv->index_pt_theta_edm] = -(1./10.) * k2 * pow(tau,4) * (ppw->pvecback[pba->index_bg_f_scf]
@@ -7260,8 +7261,7 @@ int perturbations_total_stress_energy(
     if (pba->has_scf == _TRUE_) {
     /* ET: Add here entropy dependance in delta_rho_scf and delta_p_scf */
       //delta_s_scf = ppw->pvecback[pba->index_bg_As_scf]*pow(k,ppw->pvecback[pba->index_bg_ns_scf]);
-      delta_s_scf = ppw->pvecback[pba->index_bg_As_scf]*pow((k/ppw->pvecback[pba->index_bg_kp_scf]),ppw->pvecback[pba->index_bg_ns_scf]);      //  *exp(-pow((k/ppw->pvecback[pba->index_bg_kc_scf]),ppw->pvecback[pba->index_bg_pc_scf])); // ET: delta_s with pivot and cut-off
-      //delta_s_scf = ppw->pvecback[pba->index_bg_As_scf]*pow(k,ppw->pvecback[pba->index_bg_ns_scf]); // ET: delta_s with pivot 
+      delta_s_scf = ppw->pvecback[pba->index_bg_As_scf]*pow((k/ppw->pvecback[pba->index_bg_kp_scf]),ppw->pvecback[pba->index_bg_ns_scf]) * exp( - pow(k/(ppw->pvecback[pba->index_bg_kc_scf]), ppw->pvecback[pba->index_bg_pc_scf]) );      //delta_s_scf = ppw->pvecback[pba->index_bg_As_scf]*pow(k,ppw->pvecback[pba->index_bg_ns_scf]); // ET: delta_s with pivot 
       if (ppt->gauge == synchronous){
         delta_rho_scf =  1./3.*
           (1./a2*ppw->pvecback[pba->index_bg_phi_prime_scf]*y[ppw->pv->index_pt_phi_prime_scf]
@@ -7998,7 +7998,7 @@ int perturbations_sources(
     /* ET: Add here entropy dependance in delta_rho_scf and delta_p_scf */
     if (ppt->has_source_delta_scf == _TRUE_) {
       //delta_s_scf = pvecback[pba->index_bg_As_scf]*pow(k,pvecback[pba->index_bg_ns_scf]);
-      delta_s_scf = pvecback[pba->index_bg_As_scf]*pow((k/pvecback[pba->index_bg_kp_scf]),pvecback[pba->index_bg_ns_scf]);
+      delta_s_scf = ppw->pvecback[pba->index_bg_As_scf]*pow((k/ppw->pvecback[pba->index_bg_kp_scf]),ppw->pvecback[pba->index_bg_ns_scf]) * exp( - pow(k/(ppw->pvecback[pba->index_bg_kc_scf]), ppw->pvecback[pba->index_bg_pc_scf]) );      //delta_s_scf = ppw->pvecback[pba->index_bg_As_scf]*pow(k,ppw->pvecback[pba->index_bg_ns_scf]); // ET: delta_s with pivot 
        // *exp(-pow((k/pvecback[pba->index_bg_kc_scf]),pvecback[pba->index_bg_pc_scf])); // ET: delta_s with pivot and cut-off
       //delta_s_scf = pvecback[pba->index_bg_As_scf]*pow(k,pvecback[pba->index_bg_ns_scf]); // ET: delta_s with pivot
       if (ppt->gauge == synchronous){
@@ -8586,7 +8586,7 @@ int perturbations_print_variables(double tau,
     if (pba->has_scf == _TRUE_){
       /* ET: Define here function for delta_s */
       //delta_s_scf = ppw->pvecback[pba->index_bg_As_scf]*pow(k,ppw->pvecback[pba->index_bg_ns_scf]);
-      delta_s_scf = ppw->pvecback[pba->index_bg_As_scf]*pow((k/ppw->pvecback[pba->index_bg_kp_scf]),ppw->pvecback[pba->index_bg_ns_scf]);
+      delta_s_scf = ppw->pvecback[pba->index_bg_As_scf]*pow((k/ppw->pvecback[pba->index_bg_kp_scf]),ppw->pvecback[pba->index_bg_ns_scf]) * exp( - pow(k/(ppw->pvecback[pba->index_bg_kc_scf]), ppw->pvecback[pba->index_bg_pc_scf]) );      //delta_s_scf = ppw->pvecback[pba->index_bg_As_scf]*pow(k,ppw->pvecback[pba->index_bg_ns_scf]); // ET: delta_s with pivot 
         //*exp(-pow((k/ppw->pvecback[pba->index_bg_kc_scf]),ppw->pvecback[pba->index_bg_pc_scf])); // ET: delta_s with pivot and cut-off
         //delta_s_scf = pvecback[pba->index_bg_As_scf]*pow(k,pvecback[pba->index_bg_ns_scf]); // ET: delta_s with pivot 
 
@@ -9477,7 +9477,7 @@ int perturbations_derivs(double tau,
       /** - ----> both gauges: edm density and velocity */
       /* ET: Define here function for delta_s */
       //delta_s_scf = pvecback[pba->index_bg_As_scf]*pow(k,pvecback[pba->index_bg_ns_scf]);
-       delta_s_scf = pvecback[pba->index_bg_As_scf]*pow((k/pvecback[pba->index_bg_kp_scf]),pvecback[pba->index_bg_ns_scf]);
+      delta_s_scf = ppw->pvecback[pba->index_bg_As_scf]*pow((k/ppw->pvecback[pba->index_bg_kp_scf]),ppw->pvecback[pba->index_bg_ns_scf]) * exp( - pow(k/(ppw->pvecback[pba->index_bg_kc_scf]), ppw->pvecback[pba->index_bg_pc_scf]) );      //delta_s_scf = ppw->pvecback[pba->index_bg_As_scf]*pow(k,ppw->pvecback[pba->index_bg_ns_scf]); // ET: delta_s with pivot 
         //*exp(-pow((k/pvecback[pba->index_bg_kc_scf]),pvecback[pba->index_bg_pc_scf])); // ET: delta_s with pivot and cut-off
         //delta_s_scf = pvecback[pba->index_bg_As_scf]*pow(k,pvecback[pba->index_bg_ns_scf]); // ET: delta_s with pivot 
       //if (ppt->gauge == newtonian) {
