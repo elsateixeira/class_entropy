@@ -2996,8 +2996,6 @@ double V_scf(struct background *pba,
   double scf_f0  = pba->scf_parameters[2];
 
   return  scf_V0*(1.e-120)*(1.44983e113)*exp(-scf_lambda*phi);
-  //return  scf_V0*(1.e-120)*(1.44983e113)*phi + scf_V0*(1.e-120)*(1.44983e113)*exp(-scf_lambda*phi);
-  //return scf_V0*(1.e-120)*(1.44983e113)*phi;
 }
 
 double dV_scf(struct background *pba,
@@ -3008,8 +3006,6 @@ double dV_scf(struct background *pba,
   double scf_f0  = pba->scf_parameters[2];
 
   return -scf_lambda*V_scf(pba,phi);
-  //return  scf_V0*(1.e-120)*(1.44983e113) - scf_lambda*V_scf(pba,phi);
-  //return scf_V0*(1.e-120)*(1.44983e113);
 }
 
 double ddV_scf(struct background *pba,
@@ -3019,7 +3015,6 @@ double ddV_scf(struct background *pba,
   double scf_V0  = pba->scf_parameters[1];
 
   return pow(-scf_lambda,2)*V_scf(pba,phi);
-  //return pow(-scf_lambda,2)*V_scf(pba,phi);
 }
 
 // ET: f_scf is actually g,s in the paper
@@ -3028,9 +3023,7 @@ double f_scf(struct background *pba,
                ) {
   double scf_f0  = pba->scf_parameters[2];
 
-  //return  scf_f0*phi;
   return  scf_f0*phi*(1.e-120)*(1.44983e113);
-  //return scf_V0*(1.e-120)*(1.44983e113);
 }
 
 double df_scf(struct background *pba,
@@ -3038,9 +3031,7 @@ double df_scf(struct background *pba,
                ) {
   double scf_f0  = pba->scf_parameters[2];
 
-  //return  scf_f0;
   return  scf_f0*(1.e-120)*(1.44983e113);
-  //return scf_V0*(1.e-120)*(1.44983e113);
 }
 
 double ddf_scf(struct background *pba,
@@ -3048,7 +3039,6 @@ double ddf_scf(struct background *pba,
                  ) {
   double scf_f0  = pba->scf_parameters[2];
 
-  //return pow(-scf_lambda,2)*V_scf(pba,phi);
   return 0;
 }
 
@@ -3058,9 +3048,7 @@ double h_scf(struct background *pba,
                ) {
   double scf_h0  = pba->scf_parameters[3];
 
-  //return 0;
   return  scf_h0;
-  //return scf_V0*(1.e-120)*(1.44983e113);
 }
 
 /* ET: Add function for input entropy perturbation */
@@ -3070,7 +3058,6 @@ double As_scf(struct background *pba
   double As  = pba->scf_parameters[4];
 
   return As;
-  //return 0;
 }
 
 double ns_scf(struct background *pba
@@ -3078,7 +3065,6 @@ double ns_scf(struct background *pba
   double ns = pba->scf_parameters[5];
 
   return ns;
-  //return 0;
 }
 
 double kp_scf(struct background *pba
@@ -3086,7 +3072,6 @@ double kp_scf(struct background *pba
   double kp = pba->scf_parameters[6];
 
   return kp;
-  //return 0;
 }
 
 double kc_scf(struct background *pba
@@ -3094,7 +3079,6 @@ double kc_scf(struct background *pba
   double kc = pba->scf_parameters[7];
 
   return kc;
-  //return 0;
 }
 
 double pc_scf(struct background *pba
@@ -3102,7 +3086,6 @@ double pc_scf(struct background *pba
   double pc = pba->scf_parameters[8];
 
   return pc;
-  //return 0;
 }
 
 // double V_e_scf(struct background *pba,
