@@ -4,11 +4,30 @@ from Cython.Distutils import build_ext
 
 import numpy as nm
 import os
+import re
 import subprocess as sbp
 import os.path as osp
+import platform
+import sysconfig
 
 os.environ.setdefault("CC",  "/opt/homebrew/bin/gcc-11")
 os.environ.setdefault("CXX", "/opt/homebrew/bin/g++-11")
+
+# ---------- work around Apple-specific flags when using Homebrew GCC ----------
+# Python/conda sysconfig embeds Clang flags like "-arch arm64" that GCC does
+# not understand, producing empty object files.  Strip them when the compiler
+# is GCC (not Apple Clang).
+_cc = os.environ.get("CC", "gcc-11")
+if "gcc" in os.path.basename(_cc) and "clang" not in os.path.basename(_cc):
+    _arch_re = re.compile(r"\s*-arch\s+\S+")
+    _cfg = sysconfig.get_config_vars()
+    for _key in list(_cfg.keys()):
+        if isinstance(_cfg[_key], str) and "-arch" in _cfg[_key]:
+            _cfg[_key] = _arch_re.sub("", _cfg[_key])
+
+# Align MACOSX_DEPLOYMENT_TARGET with the running system so the linker does
+# not complain about objects built for a newer macOS.
+os.environ["MACOSX_DEPLOYMENT_TARGET"] = platform.mac_ver()[0]
 
 # Recover the gcc compiler
 GCCPATH_STRING = sbp.Popen(

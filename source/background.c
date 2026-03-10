@@ -3022,13 +3022,14 @@ double ddV_scf(struct background *pba,
   //return pow(-scf_lambda,2)*V_scf(pba,phi);
 }
 
+// ET: f_scf is actually g,s in the paper
 double f_scf(struct background *pba,
                double phi
                ) {
   double scf_f0  = pba->scf_parameters[2];
 
   //return  scf_f0*phi;
-  return  scf_f0*(1.e-120)*(1.44983e113)*phi;
+  return  scf_f0*phi*(1.e-120)*(1.44983e113);
   //return scf_V0*(1.e-120)*(1.44983e113);
 }
 
@@ -3051,11 +3052,13 @@ double ddf_scf(struct background *pba,
   return 0;
 }
 
+// ET: h_scf is actually just h0 in the paper
 double h_scf(struct background *pba,
                double phi
                ) {
   double scf_h0  = pba->scf_parameters[3];
 
+  //return 0;
   return  scf_h0;
   //return scf_V0*(1.e-120)*(1.44983e113);
 }

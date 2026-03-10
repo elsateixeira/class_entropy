@@ -2,6 +2,7 @@ CLASS_rename.py
 CPU.py
 Makefile
 README.md
+pyproject.toml
 setup.py
 ./CLASS_rename.py
 ./CPU.py
@@ -96,6 +97,7 @@ setup.py
 ./python/README
 ./python/cclassy.pxd
 ./python/classy.cpp
+./python/classy.cpython-311-darwin.so
 ./python/classy.pyx
 ./python/extract_errors.py
 ./python/interface_generator.py
@@ -220,6 +222,7 @@ main/class.c
 python/README
 python/cclassy.pxd
 python/classy.cpp
+python/classy.cpython-311-darwin.so
 python/classy.pyx
 python/extract_errors.py
 python/interface_generator.py

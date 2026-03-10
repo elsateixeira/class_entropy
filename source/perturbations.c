@@ -5521,8 +5521,7 @@ int perturbations_initial_conditions(struct precision * ppr,
         delta_s_scf = ppw->pvecback[pba->index_bg_As_scf]*pow((k/ppw->pvecback[pba->index_bg_kp_scf]),ppw->pvecback[pba->index_bg_ns_scf]) * exp( - pow(k/(ppw->pvecback[pba->index_bg_kc_scf]), ppw->pvecback[pba->index_bg_pc_scf]) );
         
         ppw->pv->y[ppw->pv->index_pt_delta_edm] = 3./4.*ppw->pv->y[ppw->pv->index_pt_delta_g]; /* edm density */
-        ppw->pv->y[ppw->pv->index_pt_theta_edm] = -(1./10.) * k2 * pow(tau,4) * (ppw->pvecback[pba->index_bg_f_scf]
-               - ppw->pvecback[pba->index_bg_h_scf]*ppw->pvecback[pba->index_bg_dV_scf])* delta_s_scf*ppr->curvature_ini * s2_squared/ ppw->pvecback[pba->index_bg_rho_edm];
+        ppw->pv->y[ppw->pv->index_pt_theta_edm] = -(1./5.) * k2 * tau * (ppw->pvecback[pba->index_bg_f_scf] - ppw->pvecback[pba->index_bg_h_scf]*ppw->pvecback[pba->index_bg_dV_scf])* delta_s_scf* ppr->curvature_ini * s2_squared/ ppw->pvecback[pba->index_bg_rho_edm];
       }
       
       /* interacting dark matter */
@@ -9481,10 +9480,10 @@ int perturbations_derivs(double tau,
         //*exp(-pow((k/pvecback[pba->index_bg_kc_scf]),pvecback[pba->index_bg_pc_scf])); // ET: delta_s with pivot and cut-off
         //delta_s_scf = pvecback[pba->index_bg_As_scf]*pow(k,pvecback[pba->index_bg_ns_scf]); // ET: delta_s with pivot 
       //if (ppt->gauge == newtonian) {
-        dy[pv->index_pt_delta_edm] = -(y[pv->index_pt_theta_edm]+metric_continuity); /* cdm density */
+      dy[pv->index_pt_delta_edm] = -(y[pv->index_pt_theta_edm]+metric_continuity); /* cdm density */
         /* ET: Add here entropy source term. I removed the factor of 1/3 in rho_cdm*/
-        dy[pv->index_pt_theta_edm] = - a_prime_over_a*y[pv->index_pt_theta_edm] + metric_euler 
-        - k2*(pvecback[pba->index_bg_f_scf] - pvecback[pba->index_bg_h_scf]*pvecback[pba->index_bg_dV_scf])*delta_s_scf/(pvecback[pba->index_bg_rho_edm]);  
+      dy[pv->index_pt_theta_edm] = - a_prime_over_a*y[pv->index_pt_theta_edm] + metric_euler 
+            - k2*(pvecback[pba->index_bg_f_scf] - pvecback[pba->index_bg_h_scf]*pvecback[pba->index_bg_dV_scf])*delta_s_scf/(pvecback[pba->index_bg_rho_edm]);  
       // }
 
       // /** - ----> synchronous gauge: cdm density only (velocity set to zero by definition of the gauge) */
