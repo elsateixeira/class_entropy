@@ -16,3 +16,4 @@ doc/manual/html
 doc/manual/latex
 notebooks/old_plots/
 notebooks/*.pdf
+notebooks/Plots_entropy_old.ipynb
