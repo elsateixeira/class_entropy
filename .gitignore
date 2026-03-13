@@ -9,6 +9,7 @@ libclass.a
 python/classy.cpp
 *.pyc
 python/build/
+python/setup_mine.py
 *.dSYM
 RealSpaceInterface/cache/
 doc/manual/html
